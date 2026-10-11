@@ -6,6 +6,8 @@
 //
 
 #import "ViewController.h"
+#import "HomeViewController.h"
+#import "ProfileViewController.h"
 
 @interface ViewController ()
 
@@ -30,7 +32,7 @@
     // 2. Auto Layout 제약 조건 설정 (위치 및 크기 지정)
     [self setupConstraints];
     
-    // 3. 기존 로그인 상태 체크
+    // 3. 기존 로그인 상태 체크x
     BOOL isLoggedIn = [[NSUserDefaults standardUserDefaults] boolForKey:@"isLoggedIn"];
     if (isLoggedIn) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -135,19 +137,25 @@
 
 // 메인 화면으로 전환하는 메소드
 - (void)showMainViewController {
-    UIViewController *mainVC = [[UIViewController alloc] init];
-    mainVC.view.backgroundColor = [UIColor systemBackgroundColor];
-    mainVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    // 1. 첫 번째 탭 화면 생성 (홈)
+    HomeViewController *homeVC = [[HomeViewController alloc] init];
+    homeVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"홈"
+                                                      image:[UIImage systemImageNamed:@"house"]
+                                                        tag:0];
     
-    // 메인 화면에 로그아웃 버튼 코드로 추가
-    UIButton *logoutButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [logoutButton setTitle:@"로그아웃" forState:UIControlStateNormal];
-    logoutButton.frame = CGRectMake(100, 200, 200, 50);
-    logoutButton.center = mainVC.view.center;
-    [logoutButton addTarget:self action:@selector(logoutButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-    [mainVC.view addSubview:logoutButton];
+    // 2. 두 번째 탭 화면 생성 (마이페이지/로그아웃)
+    ProfileViewController *profileVC = [[ProfileViewController alloc] init];
+    profileVC.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"마이페이지"
+                                                         image:[UIImage systemImageNamed:@"person"]
+                                                           tag:1];
     
-    [self presentViewController:mainVC animated:YES completion:nil];
+    // 3. 탭 바 컨트롤러 생성 및 뷰 컨트롤러 배열 연결
+    UITabBarController *tabBarController = [[UITabBarController alloc] init];
+    tabBarController.viewControllers = @[homeVC, profileVC];
+    tabBarController.modalPresentationStyle = UIModalPresentationFullScreen;
+    
+    // 4. 탭 바 전체를 화면에 띄우기
+    [self presentViewController:tabBarController animated:YES completion:nil];
 }
 
 - (void)logoutButtonTapped:(UIButton *)sender {
